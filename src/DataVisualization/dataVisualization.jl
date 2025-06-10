@@ -16,6 +16,17 @@ module DataVisualization
         return df
     end
 
+    function clearOutliers(df:: DataFrame, columna::Symbol)
+        q1 = quantile(df[!, columna], 0.25)
+        q3 = quantile(df[!, columna], 0.75)
+        iqr = q3 - q1
+
+        lower = q1 - 1.5 * iqr
+        upper = q3 + 1.5 * iqr
+
+        return df[(df[!, columna] .>= lower) .& (df[!, columna] .<= upper), :]
+    end
+
     function clearDataSet()
         df = CSV.read("../../dataSet/properati_argentina_2021.csv", DataFrame)
         
@@ -57,6 +68,13 @@ module DataVisualization
         #= Se calcula el promedio de property_surface_covered para los tipos de propiedades y se completa los missing con este valor =#
         df = completarConPromedio(df, :property_type, :property_surface_covered)
 
+        #= Se filtran outliers de property_surface_total =#
+        df = clearOutliers(df, :property_surface_total)
+        
+        df = clearOutliers(df, :property_surface_covered)
+
+        df = clearOutliers(df, :property_price)
+
         return df
     end
 
@@ -68,28 +86,17 @@ module DataVisualization
         display(graf1)
     end
 
-    function plotMapPropertys(df:: DataFrame)
-        tipos = unique(df.property_type)
-
-        # Asignar un color a cada tipo
-        color_map = Dict(t => i for (i, t) in enumerate(tipos))
-        colors = [color_map[t] for t in df.property_type]
-
-        # Graficar
-        scatter(df.longitud, df.latitud;
-            group = df.property_type,
-            legend = :topleft,
-            title = "Propiedades en Capital Federal",
-            xlabel = "Longitud", ylabel = "Latitud",
-            markersize = 5,
-            palette = :viridis)
+    function plotTotalM2Price(df:: DataFrame)
+        totalM2Price = df.property_price ./ df.property_surface_total
+        
+        histogram(totalM2Price, bins=40)
     end
 
     export dataVisualization
     function dataVisualization()
         df = clearDataSet()
         plotPropertyType(df)
-        plotMapPropertys(df)
+        plotTotalM2Price(df)
     end
 
 end
