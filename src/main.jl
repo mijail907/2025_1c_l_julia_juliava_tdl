@@ -4,8 +4,8 @@ using  .DataVisualization
 using .Pelotitas
 
 function main()
-    DataVisualization.dataVisualization()
-    Simulaciones.simular_pelotitas()
+    #DataVisualization.dataVisualization()
+    Pelotitas.simular_pelotitas()
 end
 
 main()
