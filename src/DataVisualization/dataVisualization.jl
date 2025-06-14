@@ -1,8 +1,13 @@
 module DataVisualization
     using CSV
     using DataFrames
+    using MLUtils
+    using GLM
+    using StatsModels
+    using CategoricalArrays
     using Statistics
     using Plots
+    using Random
 
     function completarConPromedio(df:: DataFrame, grupo::Symbol, columna::Symbol)
         promedios = combine(groupby(df, grupo), columna => mean ∘ skipmissing => :promedio)
@@ -81,15 +86,45 @@ module DataVisualization
     function plotPropertyType(df:: DataFrame)
         countType = combine(groupby(df, [:property_type]), nrow => :cantidad)
 
-        graf1 = bar(countType.property_type, countType.cantidad, legend = false, title ="Tipos de propiedades en venta en Capital Federal en el año 2021")
+        barPlot = bar(countType.property_type, countType.cantidad, legend = false, title ="Tipos de propiedades en venta en Capital Federal en el año 2021")
 
-        display(graf1)
+        display(barPlot)
     end
 
     function plotTotalM2Price(df:: DataFrame)
         totalM2Price = df.property_price ./ df.property_surface_total
         
-        histogram(totalM2Price, bins=40)
+        histograma = histogram(totalM2Price, bins=40)
+
+        display(histograma)
+    end
+
+    function predictPrice(df:: DataFrame)
+        Random.seed!(123)  # Fijás la semilla
+        
+        df.place_l3 = categorical(df.place_l3)
+
+        df.property_type = categorical(df.property_type)
+        
+        df = shuffleobs(df)
+        
+        df_train_set, df_test_set = splitobs(df, at = 0.8)
+
+        df_train = DataFrame(df_train_set)
+
+        df_test = DataFrame(df_test_set)
+
+        regresionLineal = lm(@formula(property_price ~ property_surface_total + property_surface_covered + place_l3 + property_type), df_train)
+
+        predictions = predict(regresionLineal, df_test)
+
+        y_pred = predict(regresionLineal)
+
+        y_true = df_train.property_price
+
+        # Graficar
+        scatter(y_true, y_pred, xlabel="Valor real", ylabel="Valor predicho", label="", title="Valores reales vs predichos")
+        plot!([minimum(y_true), maximum(y_true)], [minimum(y_true), maximum(y_true)], lw=2, l=:dash, label="Ideal")
     end
 
     export dataVisualization
@@ -97,6 +132,7 @@ module DataVisualization
         df = clearDataSet()
         plotPropertyType(df)
         plotTotalM2Price(df)
+        predictPrice(df)
     end
 
 end
