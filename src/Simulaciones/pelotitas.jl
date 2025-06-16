@@ -3,6 +3,7 @@ module Pelotitas
     using Plots
     using Random
     using Base.Threads
+    using Dates
     
     export simular_pelotitas
 
@@ -13,10 +14,10 @@ Representa una pelotita con posición (x, y) y velocidad (vx, vy) en un espacio 
 """
 
     mutable struct Ball
-        x::Float64
-        y::Float64
-        vx::Float64
-        vy::Float64
+        x::Float64 #Posición horizontal (eje X) de la pelotita (entre 0 y 1)
+        y::Float64 #Posición vertical (eje Y) de la pelotita (entre 0 y 1)
+        vx::Float64 #Velocidad horizontal (qué tanto se mueve en X por frame)
+        vy::Float64 #Velocidad vertical (qué tanto se mueve en Y por frame)
     end
 
 """
@@ -32,12 +33,13 @@ y con velocidades aleatorias pequeñas en ambas direcciones.
 actualizar_posiciones!(bolas::Vector{Ball})
 
 Actualiza las posiciones de todas las pelotitas del vector bolas, aplicando su velocidad.
-Si una pelotita choca contra un borde (x o y fuera del rango 0–1), invierte su dirección (rebote).
+Si una pelotita choca contra un borde (x o y fuera del rango 0-1), invierte su dirección (rebote).
 
 Esta operación se paraleliza con @threads para mayor rendimiento.
 """
     function actualizar_posiciones!(bolas)
-        @threads for i in 1:length(bolas)
+        @threads for i  in eachindex(bolas)
+            println("Pelotita $i actualizada por hilo $(Threads.threadid())")
             b = bolas[i]
             b.x += b.vx
             b.y += b.vy
@@ -51,6 +53,20 @@ Esta operación se paraleliza con @threads para mayor rendimiento.
         end
     end
 
+function actualizar_posiciones_serial!(bolas)
+    for i in eachindex(bolas)
+        b = bolas[i]
+        b.x += b.vx
+        b.y += b.vy
+
+        if b.x < 0 || b.x > 1
+            b.vx *= -1
+        end
+        if b.y < 0 || b.y > 1
+            b.vy *= -1
+        end
+    end
+end
 """
 dibujar(bolas::Vector{Ball}) -> Plot
 
@@ -74,14 +90,48 @@ Simula el movimiento de 2 pelotitas dentro de una caja 2D durante 50 fotogramas.
 Genera una animación y la guarda como archivo pelotitas.gif en el directorio actual.
 """
     function simular_pelotitas()
-        bolas = crear_bolas(2)
-        anim = @animate for _ in 1:100
-            actualizar_posiciones!(bolas)
-            dibujar(bolas)
-        end
-        gif(anim, "pelotitas.gif", fps=20)
+        # bolas = crear_bolas(2)
+        # anim = @animate for _ in 1:50
+        #     actualizar_posiciones!(bolas)
+        #     dibujar(bolas)
+        # end
+        # gif(anim, "pelotitas.gif", fps=20)
+              # por si no está incluido afuera
+
+    println(" Iniciando comparación: secuencial vs paralela con animación de pelotitas...\n")
+
+    # Crear pelotitas
+    bolas_seq = crear_bolas(2)
+    bolas_par = deepcopy(bolas_seq)  # para comparación justa
+
+    # Medir tiempo secuencial
+    println(" Actualización secuencial:")
+    t1 = now()
+    actualizar_posiciones_serial!(bolas_seq)
+    println(" Tiempo secuencial: ", now() - t1)
+
+    # Medir tiempo paralela
+    println("\n Actualización paralela con @threads:")
+    t2 = now()
+    actualizar_posiciones!(bolas_par)
+    println(" Tiempo paralela: ", now() - t2)
+
+    println("\n Hilos disponibles: ", Threads.nthreads())
+
+    # ANIMACIÓN FINAL (para visualización con pocas pelotitas)
+    bolas = crear_bolas(2)  # pocas para que se vean mejor
+    anim = @animate for _ in 1:50
+        actualizar_posiciones!(bolas)
+        dibujar(bolas)
+    end
+
+    println("\n Generando animación visual...")
+    
         
-        println("GIF generado: pelotitas.gif")
-        println("Número de hilos disponibles: ", Threads.nthreads())
+
+    println("\n Hilos disponibles: ", Threads.nthreads())
+        
+    println("GIF generado: pelotitas.gif")
+    println("Número de hilos disponibles: ", Threads.nthreads())
     end
 end
