@@ -1,6 +1,7 @@
 module CalcularPI
 
     using Random
+    using Plots
     export calculatePI
     
     function calculatePI(pointAmount::Int)
@@ -26,6 +27,49 @@ module CalcularPI
         estimatedPi = 4 * insideCircle/pointAmount
 
         println(estimatedPi)
+
+
+        theta = range(0, stop=2*pi, length=100) # Ángulos de 0 a 2*pi
+        circulo_x = cos.(theta)
+        circulo_y = sin.(theta)
+
+        plot(circulo_x, circulo_y,
+            label="Círculo (radio 1)",
+            aspect_ratio=:equal, # Mantiene la proporción para que el círculo no se vea elíptico
+            xlims=(-1.1, 1.1), # Límites del eje X para que el cuadrado se vea bien
+            ylims=(-1.1, 1.1), # Límites del eje Y
+            title="Estimación de Pi con Monte Carlo ($pointAmount puntos)",
+            xlabel="X",
+            ylabel="Y",
+            legend=:outertopright,
+            color=:green,
+            size=(800, 800) # Tamaño de la ventana del gráfico
+        )
+
+        plot!([-1, 1, 1, -1, -1], [-1, -1, 1, 1, -1],
+            label="Cuadrado (lado 2)",
+            linecolor=:black,
+            linestyle=:dash,
+            linewidth=1
+        )
+
+        scatter!(pointsXInside, pointsYInside,
+            label="Puntos dentro",
+            color=:red,
+            marker=:o, # Usar una 'o' para los puntos dentro
+            markersize=2,
+            alpha=0.6
+        )
+
+        scatter!(pointsXOutside, pointsYOutside,
+            label="Puntos fuera",
+            color=:blue,
+            marker=:x, # Usar una 'x' para los puntos fuera
+            markersize=2,
+            alpha=0.6
+        )
+
+        annotate!(1.8, 0.6, text("Pi estimado: $estimatedPi", :right, 10))
     end
     
 end
