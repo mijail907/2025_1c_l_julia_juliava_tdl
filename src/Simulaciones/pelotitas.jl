@@ -10,14 +10,14 @@ module Pelotitas
 """
 struct Ball
 
-Representa una pelotita con posición (x, y) y velocidad (vx, vy) en un espacio 2D.
+Representa una pelotita con posición (x, y) y velocidad (velocidadX, velocidadY) en un espacio 2D.
 """
 
     mutable struct Ball
-        x::Float64 #Posición horizontal (eje X) de la pelotita (entre 0 y 1)
-        y::Float64 #Posición vertical (eje Y) de la pelotita (entre 0 y 1)
-        vx::Float64 #Velocidad horizontal (qué tanto se mueve en X por frame)
-        vy::Float64 #Velocidad vertical (qué tanto se mueve en Y por frame)
+        posicionX::Float64 #Posición horizontal (eje X) de la pelotita (entre 0 y 1)
+        posicionY::Float64 #Posición vertical (eje Y) de la pelotita (entre 0 y 1)
+        velocidadX::Float64 #Velocidad horizontal (qué tanto se mueve en X por frame)
+        velocidadY::Float64 #Velocidad vertical (qué tanto se mueve en Y por frame)
     end
 
 """
@@ -39,14 +39,14 @@ Esta operación se paraleliza con @threads para mayor rendimiento.
         @threads for i in eachindex(bolas)
             println("Pelotita $i actualizada por hilo $(Threads.threadid())")
             b = bolas[i]
-            b.x += b.vx
-            b.y += b.vy
+            b.posicionX += b.velocidadX
+            b.posicionY += b.velocidadY
 
-            if b.x < 0 || b.x > 1
-                b.vx *= -1
+            if b.posicionX < 0 || b.posicionX > 1
+                b.velocidadX *= -1
             end
-            if b.y < 0 || b.y > 1
-                b.vy *= -1
+            if b.posicionY < 0 || b.posicionY > 1
+                b.velocidadY *= -1
             end
         end
     end
@@ -57,8 +57,8 @@ El gráfico no tiene leyenda y usa color rojo por defecto.
 """
 
     function dibujar(bolas)
-        x = [b.x for b in bolas]
-        y = [b.y for b in bolas]
+        x = [b.posicionX for b in bolas]
+        y = [b.posicionY for b in bolas]
         scatter(x, y, xlim=(0,1), ylim=(0,1), legend=false, size=(400,400), title="Simulación de pelotitas", color=:red)
     end
 
