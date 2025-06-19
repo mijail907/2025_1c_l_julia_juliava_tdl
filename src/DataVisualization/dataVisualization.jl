@@ -10,6 +10,10 @@ module DataVisualization
     using Plots
     using Random
 
+    #=
+        Se recibe un DataFrame, una columna A de este la cual indica los grupos y otra columna B con la cual se calcula el promedio de estos grupos
+        Por ultimo se completa la columna B con estos promedios en las filas donde tiene missing Data
+    =#
     function completarConPromedio(df:: DataFrame, grupo::Symbol, columna::Symbol)
         promedios = combine(groupby(df, grupo), columna => mean ∘ skipmissing => :promedio)
 
@@ -22,6 +26,9 @@ module DataVisualization
         return df
     end
 
+    #= 
+        Se recibe un DataFrame y una columna de este en la cual se calcula los Outliers y se filtra estos
+    =#
     function clearOutliers(df:: DataFrame, columna::Symbol)
         q1 = quantile(df[!, columna], 0.25)
         q3 = quantile(df[!, columna], 0.75)
@@ -87,7 +94,19 @@ module DataVisualization
     function plotPropertyType(df:: DataFrame)
         countType = combine(groupby(df, [:property_type]), nrow => :cantidad)
 
-        barPlot = bar(countType.property_type, countType.cantidad, legend = false, title ="Tipos de propiedades en venta en Capital Federal en el año 2021")
+        barPlot = bar(
+            countType.property_type,
+            countType.cantidad,
+            legend = false,
+            title = "Tipos de propiedades en venta en Capital Federal en 2021",
+            xlabel = "Tipo de propiedad",
+            ylabel = "Cantidad",
+            titlefont = 12,
+            guidefont = font(10),
+            tickfont = font(9),
+            yformatter = y -> string(Int(round(y))),
+            size=(700,400)
+        )
 
         display(barPlot)
     end
@@ -95,13 +114,25 @@ module DataVisualization
     function plotTotalM2Price(df:: DataFrame)
         totalM2Price = df.property_price ./ df.property_surface_total
         
-        histograma = histogram(totalM2Price, bins=40)
+        histograma = histogram(
+            totalM2Price,
+            bins = 40,
+            xlabel = "Precio por m² total",
+            ylabel = "Frecuencia",
+            label = "y1",
+            title = "Distribución de precios por m²",
+            titlefont = 12,
+            guidefont = font(10),
+            tickfont = font(9),
+            xformatter = x -> string(Int(round(x))),
+            size=(700,400)
+        )
 
         display(histograma)
     end
 
     function predictPrice(df:: DataFrame)
-        Random.seed!(123)  # Fijás la semilla
+        Random.seed!(123)
         
         df.place_l3 = categorical(df.place_l3)
 
@@ -123,9 +154,32 @@ module DataVisualization
 
         y_true = df_train.property_price
 
-        # Graficar
-        scatter(y_true, y_pred, xlabel="Valor real", ylabel="Valor predicho", label="", title="Valores reales vs predichos")
-        plot!([minimum(y_true), maximum(y_true)], [minimum(y_true), maximum(y_true)], lw=2, l=:dash, label="Ideal")
+        # Se grafica la regresion lineal
+        linearRegresion = scatter(
+            y_true,
+            y_pred,
+            xlabel = "Valor real",
+            ylabel = "Valor predicho",
+            label = "",
+            title = "Predicción del precio de propiedades usando tipo, ubicación y superficie",
+            titlefont = 12,
+            guidefont = font(10),
+            tickfont = font(9),
+            xformatter = x -> string(Int(round(x))),
+            yformatter = y -> string(Int(round(y))),
+            size=(800,500)
+        )
+        plot!(
+            linearRegresion,
+            [minimum(y_true), maximum(y_true)],
+            [minimum(y_true), maximum(y_true)],
+            lw = 2,
+            l = :dash,
+            label = "Precio Ideal",
+            linecolor = :red
+        )
+
+        display(linearRegresion)
     end
 
     export dataVisualization
