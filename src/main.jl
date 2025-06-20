@@ -3,18 +3,19 @@ include("CalcularPi/monteCarlo.jl")
 include("Simulaciones/pelotitas.jl")
 include("encontrarNumerosPrimos/buscarPrimos.jl")
 
-using  .DataVisualization
+using .DataVisualization
 using .CalcularPI
 using .Pelotitas
-
 using .Primos
+
+using Dates
 
 function main()
 
     DataVisualization.dataVisualization()
     Pelotitas.simular_pelotitas()
     CalcularPI.calculatePI(1000)
-    println(Primos.encontrar_primos(1, 100))
+    Pelotitas.simular_pelotitas()
 end
 
 main()
