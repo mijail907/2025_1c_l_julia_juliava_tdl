@@ -12,10 +12,10 @@ using Dates
 
 function main()
 
-    DataVisualization.dataVisualization()
-    Pelotitas.simular_pelotitas()
-    CalcularPI.calculatePI(1000)
-    Pelotitas.simular_pelotitas()
+    # DataVisualization.dataVisualization()
+    # Pelotitas.simular_pelotitas()
+    # CalcularPI.calculatePI(1000)
+    Primos.test_paralelismo()
 end
 
 main()
