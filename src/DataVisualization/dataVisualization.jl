@@ -107,8 +107,7 @@ module DataVisualization
             yformatter = y -> string(Int(round(y))),
             size=(700,400)
         )
-
-        display(barPlot)
+        savefig(barPlot, "Salidas/barPlot.png")
     end
 
     function plotTotalM2Price(df:: DataFrame)
@@ -128,7 +127,7 @@ module DataVisualization
             size=(700,400)
         )
 
-        display(histograma)
+        savefig(histograma, "Salidas/histograma.png")
     end
 
     function predictPrice(df:: DataFrame)
@@ -179,12 +178,13 @@ module DataVisualization
             linecolor = :red
         )
 
-        display(linearRegresion)
+        savefig(linearRegresion, "Salidas/linearRegresion.png")
     end
 
     export dataVisualization
     function dataVisualization()
         df = clearDataSet()
+        mkpath("Salidas")
         plotPropertyType(df)
         plotTotalM2Price(df)
         predictPrice(df)

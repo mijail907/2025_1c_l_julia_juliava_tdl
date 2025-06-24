@@ -59,6 +59,8 @@ Busca primos en paralelo dividiendo el tramo en 2 y usando tareas
     end
 
     function test_paralelismo()
+        println("Comparación entre Búsqueda secuencial vs Búsqueda paralela")
+
         desde = 1
         hasta = 20_000_000
 
@@ -74,7 +76,7 @@ Busca primos en paralelo dividiendo el tramo en 2 y usando tareas
         tiempo_par = time() - t2
         println(" Tiempo paralelo: $(round(tiempo_par, digits=3)) segundos")
 
-        println("\n ¿Resultados iguales? ", primos_seq == primos_par)
+        println("\n ¿Cantidad de números primos encontrados por igual? ", primos_seq == primos_par)
     end
 
 end # module

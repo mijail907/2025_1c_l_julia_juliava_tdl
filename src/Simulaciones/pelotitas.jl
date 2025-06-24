@@ -68,7 +68,9 @@ Genera una animación y la guarda como archivo pelotitas.gif en el directorio ac
 """
 
 function simular_pelotitas()
-    println(" Iniciando comparación: secuencial vs paralela con animación de pelotitas...\n")
+    print("Ejemplo de division de tareas(Paralelismo), usando dos hilos para actualizar una pelotita cada uno")
+    println("\n Hilos disponibles: ", Threads.nthreads())
+
     bolas = crear_bolas(2)  # pocas para que se vean mejor
     anim = @animate for _ in 1:50
         actualizar_posiciones!(bolas)
@@ -76,14 +78,10 @@ function simular_pelotitas()
         
     end
 
-    println("\n Hilos disponibles: ", Threads.nthreads())
-
     # gif(anim, "pelotitas.gif", fps=20)
-    mkpath("../Salidas")  # crea la carpeta si no existe
-    gif(anim, "../Salidas/pelotitas.gif", fps=20)  # guarda el gif en la carpeta correcta
-
-    println("\n Generando animación visual...")  
-    println("GIF generado en: Salidas/pelotitas.gif")
+    mkpath("Salidas")  # crea la carpeta si no existe
+    
+    gif(anim, "Salidas/pelotitas.gif", fps=20)  # guarda el gif en la carpeta correcta
 
     println("Número de hilos disponibles: ", Threads.nthreads())
     end
