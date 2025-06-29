@@ -28,6 +28,8 @@ module CalcularPI
 
         estimatedPi = 4 * insideCircle/pointAmount
 
+        println("Puntos dentro del círculo: $insideCircle")
+
         println("Pi estimado: $estimatedPi")
 
 
