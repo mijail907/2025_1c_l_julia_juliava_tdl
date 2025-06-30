@@ -7,7 +7,7 @@ Pasos para ejecutar el proyecto una vez clonado o descargado:
 2- En la terminar ejecutá los siguientes comandos:
 
 # Instala los paquetes necesarios
-    2.1- julia --project=. -e
+    julia --project=. -e 'import Pkg; Pkg.instantiate()'
 
 # Ejecuata el programa
-    2.2- julia --project=. -t 2 src/main.jl
+    julia --project=. -t 3 src/main.jl
