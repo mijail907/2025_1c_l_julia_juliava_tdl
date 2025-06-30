@@ -1,6 +1,6 @@
 module Primos
 
-export encontrar_primos, es_primo, encontrar_primos_parallel, test_paralelismo
+export encontrar_primos, es_primo, encontrar_primos_paralelo, test_paralelismo
 
 """
 Devuelve una lista con todos los números primos en el rango `[desde, hasta]`.
@@ -37,9 +37,9 @@ Devuelve `true` si `n` es un número primo, `false` si no lo es.
     end
 
 """
-Busca primos en paralelo dividiendo el tramo en 2 y usando tareas 
+Busca primos en paralelo dividiendo el tramo en 3 y usando tareas 
 """
-function encontrar_primos_parallel(desde::Int, hasta::Int)
+function encontrar_primos_paralelo(desde::Int, hasta::Int)
     tercio = (hasta - desde + 1) ÷ 3
     tramo1_ini = desde
     tramo1_fin = desde + tercio - 1
@@ -83,7 +83,7 @@ Compara tiempos de ejecución entre versión secuencial y paralela.
 
         println("\nBúsqueda paralela:")
         t2 = time()
-        primos_par = encontrar_primos_parallel(desde, hasta)
+        primos_par = encontrar_primos_paralelo(desde, hasta)
         tiempo_par = time() - t2
         println("Tiempo paralelo: $(round(tiempo_par, digits=3)) segundos")
 
